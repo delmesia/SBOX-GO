@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -16,7 +15,17 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
+	snippets, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	for _, snippet := range snippets {
+		fmt.Fprintf(w, "%+v\n", snippet)
+	}
+
+	/*files := []string{
 		"/Users/del/Dev/SBOX-GO/ui/html/pages/home.html",
 		"/Users/del/Dev/SBOX-GO/ui/html/base.html",
 		"/Users/del/Dev/SBOX-GO/ui/html/partials/nav.html",
@@ -31,7 +40,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		app.serverError(w, err)
-	}
+	}*/
 
 }
 

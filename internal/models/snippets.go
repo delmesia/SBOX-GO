@@ -77,19 +77,34 @@ func (m *SnippetModel) Latest() ([]*Snippet, error) {
 	snippets := []*Snippet{}
 
 	// rows.Next() is used to iterate through the rows in the resultset.
-	//
+	// this prepares the first (and then each subsequent) row to be acted on by
+	// the row.Scan() method. if iteration over all the rows completes then the
+	// resultset automatically closes itself and frees-up the underlying
+	// database connection.
 	for rows.Next() {
+
+		// Create a pointer to a new zeroed Snippet struct.
 		s := &Snippet{}
-		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Content, &s.Created, &s.Expires)
+
+		// row.Scan() will copy the values from each field in a the row to the
+		// new Snippet object created. The arguments to row.Scan() must be pointers to the place we want
+		// to copy the data into. The number of arguments must be exactly the same as the number
+		// of columns returned by the statement.
+		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 		if err != nil {
 			return nil, err
 		}
+		// Append each Snippet got from row.Scan after putting it to S.
 		snippets = append(snippets, s)
 	}
 
+	// when the rows.Next() loop has finished, we call rows.Err() to retrieve any error
+	// that was encountered during the iteration. It's important to call this,
+	// don't assume a successful iteration was completed over the whole resultset
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+	//if everyting went okay, return the Snippets slice and nil to indicate that it's successful
 	return snippets, nil
 
 }
