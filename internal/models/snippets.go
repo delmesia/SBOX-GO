@@ -71,6 +71,7 @@ func (m *SnippetModel) Latest() ([]*Snippet, error) {
 	// always properly closed before the Latest() method returns.
 	// this defer statement should come *after* the error check from the Query() method.
 	// otherwise, if Query() returns an error, it'll panic trying to close a nil resultset.
+
 	defer rows.Close()
 
 	// Initialize an empty slice to hold the Snippet structs.
